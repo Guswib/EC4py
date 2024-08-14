@@ -17,9 +17,9 @@ Features
 * Read TDMS files.
     ** Plot
 
-* Treats cyclic voltammetry data:
-    ** subtraction, addition
-    ** back ground subtraction 
-    ** Levich analysis
-    ** Cout
+*   Treats cyclic voltammetry(CV) data:
+    * subtraction, addition
+    * back ground subtraction 
+    * Levich analysis
+    * Koutechy-Levich analysis
 

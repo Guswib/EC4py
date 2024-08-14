@@ -7,7 +7,6 @@ import math
 import numpy as np
 from scipy import integrate
 from scipy.signal import savgol_filter 
-from scipy import integrate
 
 import copy
 
