@@ -4,7 +4,7 @@ This is a package to treat electrochemical data in order to extract key values s
 
 A simple example
 ---------------
-.. code::python
+.. code:: python
     
     from EC4py import EC_Data
 
@@ -15,7 +15,11 @@ Features
 --------
 
 * Read TDMS files.
+    ** Plot
 
 * Treats cyclic voltammetry data:
+    ** subtraction, addition
+    ** back ground subtraction 
     ** Levich analysis
+    ** Cout
 
