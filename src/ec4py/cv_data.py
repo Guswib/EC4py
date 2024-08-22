@@ -13,9 +13,13 @@ import copy
 from .ec_data import EC_Data
 
 from .ec_setup import EC_Setup
-from .util_graph import plot_options
 from .util import extract_value_unit     
 from .util import Quantity_Value_Unit as Q_V
+from .util_graph import plot_options,quantity_plot_fix, make_plot_2x,make_plot_1x
+from .analysis_tafel import Tafel
+
+STYLE_POS_DL = "bo"
+STYLE_NEG_DL = "ro"
 
 class CV_Data(EC_Setup):
     """# Class to analyze a single CV data. 
@@ -54,7 +58,6 @@ class CV_Data(EC_Setup):
         ##self.name="CV" name is given in the setup.
         self.xmin = -2.5
         self.xmax = 2.5
-        self.setup = {}
         if not args:
             return
         else:
@@ -455,3 +458,73 @@ class CV_Data(EC_Setup):
             return  Q_p #[Q_n[end]-Q_n[0],Q_unit]
         else:
             return [Q_p, Q_n] #[Q_p[end]-Q_p[0] ,Q_unit, Q_n[end]-Q_n[0],Q_unit]
+        
+        
+   ##################################################################################################################
+    def Tafel(self, lims=[-1,1], E_for_idl:float=None , *args, **kwargs):
+        """_summary_
+
+        Args:
+            lims (list):  The range where the tafel slope should be calculated 
+            E_for_idl (float,optional.): potential that used to determin the diffusion limited current. This is optional.
+            
+        """
+        Tafel_op= {"cv_plot": None,"analyse_plot": None}
+        Tafel_op.update(kwargs)
+        CV_plot = Tafel_op["cv_plot"]
+        analyse_plot = Tafel_op["analyse_plot"]
+        if Tafel_op["cv_plot"] is None and Tafel_op["analyse_plot"] is None:
+            CV_plot, analyse_plot = make_plot_2x("Tafel Analysis")
+            CV_plot.title.set_text('CV')
+            analyse_plot.title.set_text('Tafel Plot')
+            
+        
+        rot=[]
+        y = []
+        E = []
+        Tafel_pos =[]
+        Tafel_neg =[]
+        #Epot=-0.5
+        y_axis_title =""
+        cv = copy.deepcopy(self)
+        cv_kwargs = kwargs
+        dir = kwargs.get("dir", "all")
+        plot_color2= []
+        
+        rot.append( math.sqrt(cv.rotation))
+    
+        for arg in args:
+            #if arg == "area":
+            cv.norm(arg)
+        cv_kwargs["legend"] = str(f"{float(cv.rotation):.0f}")
+        cv_kwargs["plot"] = CV_plot
+        line,a = cv.plot(**cv_kwargs)
+        plot_color2.append(line.get_color())
+        plot_color =line.get_color()
+        #.get_color()
+        #color = line.get_color()
+        xmin = cv.get_index_of_E(min(lims))
+        xmax = cv.get_index_of_E(max(lims))
+            
+            
+            
+        if E_for_idl != None:
+            i_dl_p,i_dl_n = cv.get_i_at_E(E_for_idl)
+            y.append(cv.get_i_at_E(E_for_idl))
+            E.append(E_for_idl)
+            with np.errstate(divide='ignore'):
+                y_data_p = [math.log10(abs(1/(1/i-1/i_dl_p))) for i in cv.i_p]
+                y_data_n = [math.log10(abs(1/(1/i-1/i_dl_n))) for i in cv.i_n]
+        else:
+            y_data_p = [math.log10(abs(i)) for i in cv.i_p]
+            y_data_n = [math.log10(abs(i)) for i in cv.i_n]
+                
+        Tafel_pos = Tafel(cv.E[xmin:xmax],y_data_p[xmin:xmax],cv.i_unit,cv.i_label,plot_color,"Pos",cv.E, y_data_p,plot=analyse_plot)
+        Tafel_neg = Tafel(cv.E[xmin:xmax],y_data_n[xmin:xmax],cv.i_unit,cv.i_label,plot_color,"Neg",cv.E, y_data_n, plot=analyse_plot)
+        
+        y_values = np.array(y)
+        if E_for_idl is not None:
+            CV_plot.plot(E,y_values[:,0], STYLE_POS_DL, E,y_values[:,1],STYLE_NEG_DL)
+        CV_plot.legend()
+    
+        return Tafel_pos, Tafel_neg

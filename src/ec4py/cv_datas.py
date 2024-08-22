@@ -16,6 +16,8 @@ from pathlib import Path
 import copy
 from .util import Quantity_Value_Unit as Q_V
 from .util_graph import plot_options,quantity_plot_fix, make_plot_2x,make_plot_1x
+from .analysis_levich import Levich
+from .analysis_tafel import Tafel
 
 
 STYLE_POS_DL = "bo"
@@ -203,43 +205,13 @@ class CV_Datas:
        # y = np.array(y)
         rot_max = max(rot) 
         #Levich analysis
-        
-        analyse_plot.plot(rot,y[:,0],STYLE_POS_DL)
-        analyse_plot.plot(rot,y[:,1],STYLE_NEG_DL)
-        x_qv = Q_V(1, "rpm^0.5","w")
-        x_qv = x_qv**0.5
-        x_qv.value = 1
-        x_rot = Q_V(1,x_qv.unit,x_qv.quantity)
-        ##print("aa", x_qv.unit)
-        y_qv = Q_V(1, y_axis_unit.strip(),y_axis_title.strip())
-                
-        analyse_plot.set_xlabel("$\omega^{0.5}$ ( rpm$^{0.5}$)")
-        analyse_plot.set_ylabel(f"{quantity_plot_fix(y_axis_title)} ({quantity_plot_fix(y_axis_unit)})" )
-        #analyse_plot.set_xlim([0, math.sqrt(rot_max)])
-        #analyse_plot.xlim(left=0)
-        x_plot = np.insert(rot,0,0)
-        m_pos, b = np.polyfit(rot, y[:,0], 1)
-        y_pos= m_pos*x_plot+b
-        ##print("AAA",x_rot, "BBB", x_rot.quantity)
-       
-        
-        B_factor_pos = Q_V(m_pos, y_axis_unit,y_axis_title) #/ x_rot
-        ##print("AAA",B_factor_pos, "BBB", B_factor_pos.quantity)
-        line, = analyse_plot.plot(x_plot,y_pos,'b-' )
-        line.set_label(f"pos: B={m_pos:3.3e}")
-        m_neg, b = np.polyfit(rot, y[:,1], 1)
-        y_neg= m_neg*x_plot+b
-        B_factor_neg = Q_V(m_neg, y_axis_unit,y_axis_title) / x_rot
-        line,=analyse_plot.plot(x_plot,y_neg,'r-' )
-        line.set_label(f"neg: B={m_neg:3.3e}")
-        #ax.xlim(left=0)
-        analyse_plot.legend()
-        analyse_plot.set_xlim(left=0,right =None)
-        
+        B_factor_pos= Levich(rot,y[:,0],y_axis_unit,y_axis_title,STYLE_POS_DL,"pos",plot=analyse_plot )
+        B_factor_neg = Levich(rot,y[:,1],y_axis_unit,y_axis_title,STYLE_NEG_DL,"neg",plot=analyse_plot )
+
         print("Levich analysis" )
         print("dir","\tpos     ", "\tneg     " )
         print(" :    ",f"\t{y_axis_unit} / rpm^0.5",f"\t{y_axis_unit} / rpm^0.5")
-        print("slope:","\t{:.2e}".format(m_pos) ,"\t{:.2e}".format(m_neg))
+        print("slope:","\t{:.2e}".format(B_factor_pos.value) ,"\t{:.2e}".format(B_factor_neg.value))
         return B_factor_pos,B_factor_neg
 
     #######################################################################################################
@@ -343,6 +315,18 @@ class CV_Datas:
         return slope_pos,slope_neg
     
     ##################################################################################################################
+    
+    def Tafel2(self, lims=[-1,1], E_for_idl:float=None , *args, **kwargs):
+        CV_plot, analyse_plot = make_plot_2x("Tafel Analysis")
+        CV_plot.title.set_text('CVs')
+
+        analyse_plot.title.set_text('Tafel Plot')   
+        cv_kwargs = kwargs
+        cv_kwargs['cv_plot']=CV_plot
+        cv_kwargs['analyse_plot']=analyse_plot
+        for cv in self.datas:
+            cv.Tafel(lims, E_for_idl,  **cv_kwargs)
+    
     def Tafel(self, lims=[-1,1], E_for_idl:float=None , *args, **kwargs):
         """_summary_
 

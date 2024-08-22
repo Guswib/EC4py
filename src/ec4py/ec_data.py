@@ -34,7 +34,6 @@ class EC_Data(EC_Setup):
         self.Phase_U=np.array([],dtype=np.float64)
         self.path=""
         self.rawdata = None
-        #self.setup = {}
         """All setup information given in the file.
         """
         
@@ -157,13 +156,8 @@ class EC_Data(EC_Setup):
         return cosValue          
     
     def index_at_time(self, time_s_:float):
-        max_index = len(self.Time)
-        index = -1
-        for i in range(max_index):
-            if time_s_ < self.Time[i]:
-                index = i
-                break
-        return index
+        return index_at_time(self.Time, time_s_)
+
     
     def plot(self, x_channel:str, y_channel:str, **kwargs):
         '''
@@ -252,3 +246,12 @@ class EC_Data(EC_Setup):
             
             
     
+def index_at_time(Time, time_s_:float):
+    max_index = len(Time)
+    index = -1
+    for i in range(max_index):
+        if time_s_ < Time[i]:
+            index = i
+            break
+    if index < 0: index = len(Time)-1
+    return index
