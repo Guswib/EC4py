@@ -38,7 +38,8 @@ class Step_Datas:
     ### Options keywords:
     legend = "name"
     """
-    def __init__(self, paths:list[Path] | Path|None, **kwargs):
+    def __init__(self, paths:list[Path] | Path|None = None, **kwargs):
+        
         
         if paths is None:
             return
