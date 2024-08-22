@@ -15,7 +15,8 @@ from .ec_data import EC_Data,index_at_time
 from .ec_setup import EC_Setup
 from .util_graph import plot_options
 from .util import extract_value_unit     
-from .util import Quantity_Value_Unit as Q_V
+from .util import Quantity_Value_Unit as QV
+#from .step_datas import Step_Datas
 
 class Step_Data(EC_Setup):
 
@@ -39,7 +40,22 @@ class Step_Data(EC_Setup):
             #print(kwargs)
             self.conv(EC_Data(args[0]),**kwargs)
     #############################################################################   
-    
+    def __getitem__(self, item_index:int|slice) -> Step_Data: 
+        if isinstance(item_index, slice):
+            step = 1
+            start = 0
+            stop = len(self.step_Time)
+            if item_index.step:
+                step =  item_index.step
+            if item_index.start:
+                start = item_index.start
+            if item_index.stop:
+                stop = item_index.stop 
+            
+            return [self.get_step(i) for i in range(start,stop,step)]
+        else:
+            return self.get_step(item_index)
+    ###########################################       
     def conv(self, ec_data: EC_Data, *args, ** kwargs):
         """Converts EC_Data to a CV
 
@@ -116,30 +132,48 @@ class Step_Data(EC_Setup):
         except NameError:
             print(f"xchannel {x_channel} not supported")
         try:
-            y_data, options.y_label, options.y_unit = self.E,"E","V"
+            if y_channel =='E':
+                y_data, options.y_label, options.y_unit = self.E,"E","V"
+            else:
+                y_data, options.y_label, options.y_unit = self.i,self.i_label,self.i_unit
             options.y_data = y_data[index_min:index_max]
         except NameError:
             print(f"ychannel {y_channel} not supported")
 
         return options.exe()
-    
+        ##################################################################################################################
+
     def index_at_time(self, time_s_:float):
         return index_at_time(self.Time, time_s_)
-    
+       ##################################################################################################################
+ 
     def get_step(self,step_index:int):
         singleStep = Step_Data()
         singleStep.setup_data = self.setup_data
-        startT = 0.0
-        endT = float(self.step_Time[step_index])
-        if(step_index != 0):
-            startT = float(self.step_Time[step_index-1]) 
-        #print("startT",startT)
-        #print("endT",endT)
+        print(self.step_Time)
+        total_nr_steps = len(self.step_Time)-1
+        s=[0.0]
+        for i in range(0, total_nr_steps):
+            num =float(self.step_Time[i])
+            s.append(s[i]+num)
+        print(s)
+        idx = step_index % total_nr_steps
+       # print("total", total_nr_steps)
+       # print("idx", idx)
+        multi = math.floor(step_index / total_nr_steps)
+      #  print("multi", multi)
+        extra = s[total_nr_steps]*multi
+      #  print("extra", extra)
+        startT = s[idx]
+        endT = s[idx+1]
+         
+     #   print("startT",startT)
+      #  print("endT",endT)
         
-        start_index = self.index_at_time(startT)
-        end_index =   self.index_at_time(endT)
-        #print("startT",start_index)
-        #print("endT",end_index)
+        start_index = self.index_at_time(startT+extra)-1
+        end_index =   self.index_at_time(endT+extra)-1
+      #  print("startT",start_index)
+     #   print("endT",end_index)
         aSize=end_index-start_index+1
         singleStep.E = np.empty(aSize) 
         singleStep.i = np.empty(aSize) 
@@ -149,8 +183,30 @@ class Step_Data(EC_Setup):
         np.copyto(singleStep.Time, self.Time[start_index:end_index+1]-self.Time[start_index])
         
         singleStep.step_Time =[singleStep.Time.max()]
-        singleStep.step_E =[self.step_E[step_index]]
-        singleStep.step_Type =[self.step_Type[step_index]]
+        singleStep.step_E =[self.step_E[idx]]
+        singleStep.step_Type =[self.step_Type[idx]]
         return singleStep
+    
+    def integrate(self,t_start,t_end):
+        """_summary_
+
+        Args:
+            t_start (_type_): _description_
+            t_end (_type_): _description_
+            y_channel (str, optional): _description_. Defaults to "i".
+
+        Returns:
+            _type_: _description_
+        """
+        idxmin=self.index_at_time(t_start)
+        idxmax=self.index_at_time(t_end)+1
+        #y,quantity,unit = self.get_channel(y_channel)
+        array_Q = integrate.cumulative_simpson(self.i[idxmin:idxmax], x=self.Time[idxmin:idxmax], initial=0)
+        Charge = QV(array_Q[len(array_Q)-1]-array_Q[0],self.i_unit,self.i_label)* QV(1,"s","t")
+        return Charge
+    
+    
+    def Tafel(self, lims=[-1,1], *args, **kwargs):
+        return
         
         

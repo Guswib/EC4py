@@ -38,8 +38,10 @@ class Step_Datas:
     ### Options keywords:
     legend = "name"
     """
-    def __init__(self, paths:list[Path] | Path, **kwargs):
+    def __init__(self, paths:list[Path] | Path|None, **kwargs):
         
+        if paths is None:
+            return
         if isinstance(paths,Path ):
             path_list = [paths]
         else:
@@ -94,34 +96,23 @@ class Step_Datas:
             
             
         """
-        #CV_plot = make_plot_1x("CVs")
         p = plot_options(kwargs)
-        p.set_title("CVs")
+        p.set_title("Steps")
         line, CV_plot = p.exe()
         legend = p.legend
-        #analyse_plot.title.set_text('CVs')
-
-        #analyse_plot.title.set_text('Levich Plot')
-        
-        rot=[]
-        y = []
-        E = []
-        #Epot=-0.5
-        y_axis_title =""
-        CVs = copy.deepcopy(self.datas)
+        datas = copy.deepcopy(self.datas)
         #CVs = [CV_Data() for i in range(len(paths))]
         cv_kwargs = kwargs
-        for cv in CVs:
+        for data in datas:
             #rot.append(math.sqrt(cv.rotation))
             for arg in args:
-                cv.norm(arg)
+                data.norm(arg)
 
             cv_kwargs["plot"] = CV_plot
-            cv_kwargs["name"] = cv.setup_data.name
+            cv_kwargs["name"] = data.setup_data.name
             if legend == "_" :
-                cv_kwargs["legend"] = cv.setup_data.name
-            
-            p = cv.plot(**cv_kwargs)
+                cv_kwargs["legend"] = data.setup_data.name
+            p = data.plot(**cv_kwargs)
          
         CV_plot.legend()
         return CV_plot
@@ -130,7 +121,8 @@ class Step_Datas:
    
     
     ##################################################################################################################
-    def Tafel(self, lims=[-1,1], E_for_idl:float=None , *args, **kwargs):
+    def Tafel(self, lims=[-1,1], *args, **kwargs):
+        
         return
     
     

@@ -14,7 +14,7 @@ from .ec_setup import EC_Setup
 
 from pathlib import Path
 import copy
-from .util import Quantity_Value_Unit as Q_V
+from .util import Quantity_Value_Unit as QV
 from .util_graph import plot_options,quantity_plot_fix, make_plot_2x,make_plot_1x
 from .analysis_levich import Levich
 from .analysis_tafel import Tafel
@@ -150,17 +150,8 @@ class CV_Datas:
         p.set_title("CVs")
         line, CV_plot = p.exe()
         legend = p.legend
-        #analyse_plot.title.set_text('CVs')
-
-        #analyse_plot.title.set_text('Levich Plot')
         
-        rot=[]
-        y = []
-        E = []
-        #Epot=-0.5
-        y_axis_title =""
         CVs = copy.deepcopy(self.datas)
-        #CVs = [CV_Data() for i in range(len(paths))]
         cv_kwargs = kwargs
         for cv in CVs:
             #rot.append(math.sqrt(cv.rotation))
@@ -203,7 +194,7 @@ class CV_Datas:
         rot,y,E,y_axis_title,y_axis_unit  = plots_for_rotations(self.datas,Epot,*args, **cv_kwargs)
        # rot = np.array(rot)
        # y = np.array(y)
-        rot_max = max(rot) 
+        #rot_max = max(rot) 
         #Levich analysis
         B_factor_pos= Levich(rot,y[:,0],y_axis_unit,y_axis_title,STYLE_POS_DL,"pos",plot=analyse_plot )
         B_factor_neg = Levich(rot,y[:,1],y_axis_unit,y_axis_title,STYLE_NEG_DL,"neg",plot=analyse_plot )
@@ -268,13 +259,13 @@ class CV_Datas:
         
         rot = 1 / rot 
         x_plot = np.insert(rot,0,0)  
-        x_qv = Q_V(1, "rpm^0.5","w")
-        x_u =  Q_V(1, x_qv.unit,x_qv.quantity)** -0.5
+        x_qv = QV(1, "rpm^0.5","w")
+        x_u =  QV(1, x_qv.unit,x_qv.quantity)** -0.5
         #print(x_plot) 
         y_values = np.array(y)
         y_inv = 1/ y_values
         
-        y_qv = Q_V(1, y_axis_unit.strip(),y_axis_title.strip())**-1
+        y_qv = QV(1, y_axis_unit.strip(),y_axis_title.strip())**-1
         #print(rot)
         #print(y[:,0])
 
@@ -292,14 +283,14 @@ class CV_Datas:
         m_pos, b = np.polyfit(rot, y_inv[:,0], 1)
         
         y_pos= m_pos*x_plot+b
-        slope_pos = Q_V(m_pos,dydx_qv.unit,dydx_qv.quantity)
+        slope_pos = QV(m_pos,dydx_qv.unit,dydx_qv.quantity)
         
         B_pos = 1/m_pos
         line,=analyse_plot.plot(x_plot,y_pos,'b-' )
         line.set_label(f"pos: m={B_pos:3.3e}")
         #FIT neg
         m_neg, b = np.polyfit(rot, y_inv[:,1], 1)
-        slope_neg = Q_V(m_neg,dydx_qv.unit,dydx_qv.quantity)
+        slope_neg = QV(m_neg,dydx_qv.unit,dydx_qv.quantity)
         y_neg= m_neg*x_plot+b
         B_neg = 1/m_neg
         line,=analyse_plot.plot(x_plot,y_neg,'r-' )
@@ -324,17 +315,23 @@ class CV_Datas:
         cv_kwargs = kwargs
         cv_kwargs['cv_plot']=CV_plot
         cv_kwargs['analyse_plot']=analyse_plot
+        Tafel_pos =[]
+        Tafel_neg =[]
         for cv in self.datas:
-            cv.Tafel(lims, E_for_idl,  **cv_kwargs)
-    
+            a,b = cv.Tafel(lims, E_for_idl,  **cv_kwargs)
+            Tafel_pos.append(a)
+            Tafel_neg.append(b)
+        return Tafel_pos, Tafel_neg
+       ##################################################################################################################
+    """
     def Tafel(self, lims=[-1,1], E_for_idl:float=None , *args, **kwargs):
-        """_summary_
+        ""_summary_
 
         Args:
             lims (list):  The range where the tafel slope should be calculated 
             E_for_idl (float,optional.): potential that used to determin the diffusion limited current. This is optional.
             
-        """
+        ""
         CV_plot, analyse_plot = make_plot_2x("Tafel Analysis")
         CV_plot.title.set_text('CVs')
 
@@ -381,10 +378,10 @@ class CV_Datas:
             ##FIT    
             m_pos, b = np.polyfit(cv.E[xmin:xmax], y_data_p[xmin:xmax], 1)
             y_pos= m_pos*cv.E[xmin:xmax]+b
-            Tafel_pos.append(Q_V(1/ m_pos,"V/dec","dE"))
+            Tafel_pos.append(QV(1/ m_pos,"V/dec","dE"))
             m_neg, b = np.polyfit(cv.E[xmin:xmax], y_data_n[xmin:xmax], 1)
             y_neg= m_neg*cv.E[xmin:xmax]+b
-            Tafel_neg.append(Q_V(1/ m_neg,"V/dec","dE"))
+            Tafel_neg.append(QV(1/ m_neg,"V/dec","dE"))
             
             print("Tafel", 1./ m_pos , "V/dec")
             if E_for_idl != None:
@@ -427,7 +424,7 @@ class CV_Datas:
         #print("Tafel",m_pos,m_neg)
         #return m_pos,m_neg
         return Tafel_pos, Tafel_neg
-    
+        """
     
     
 def plots_for_rotations(datas: CV_Datas,Epot:float, *args, **kwargs):
@@ -439,10 +436,10 @@ def plots_for_rotations(datas: CV_Datas,Epot:float, *args, **kwargs):
     y_axis_unit =""
     CVs = copy.deepcopy(datas)
     cv_kwargs = kwargs
-    x_qv = Q_V(1, "rpm^0.5","w")
+    #x_qv = QV(1, "rpm^0.5","w")
     line=[]
     for cv in CVs:
-        x_qv = cv.rotation
+        #x_qv = cv.rotation
         rot.append(math.sqrt(cv.rotation))
         for arg in args:
             cv.norm(arg)

@@ -14,7 +14,8 @@ from .ec_datas import EC_Datas
 from .cv_data import CV_Data
 from .cv_datas import CV_Datas 
 from .step_data import Step_Data 
+from .step_datas import Step_Datas 
 from .util import Quantity_Value_Unit 
 
-__all__ = ["EC_Data","EC_Datas","CV_Data","CV_Datas","Step_Data","Quantity_Value_Unit"]
+__all__ = ["EC_Data","EC_Datas","CV_Data","CV_Datas","Step_Data","Step_Datas","Quantity_Value_Unit"]
 

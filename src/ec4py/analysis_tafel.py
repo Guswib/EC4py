@@ -1,9 +1,24 @@
 import numpy as np
 
 from .util import Quantity_Value_Unit as Q_V
-from .util_graph import plot_options,quantity_plot_fix
+from .util_graph import plot_options
 
 def Tafel(x_data,y_data, y_axis_unit,y_axis_title,plot_color,lineName="",x_data_ext =None, y_data_ext =None,  **kwargs):
+    """Tafel analys
+
+    Args:
+        x_data (_type_): potential data
+        y_data (_type_): current data in log
+        y_axis_unit (_type_): current unit
+        y_axis_title (_type_): current quantity
+        plot_color (_type_): _description_
+        lineName (str, optional): _description_. Defaults to "".
+        x_data_ext (_type_, optional): _description_. Defaults to None.
+        y_data_ext (_type_, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
     p = plot_options(kwargs)
     p.set_title("Tafel")
     line, analyse_plot = p.exe()
