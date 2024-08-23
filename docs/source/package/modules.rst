@@ -1,4 +1,4 @@
-ec4py
+EC4py
 =====
 
 .. toctree::

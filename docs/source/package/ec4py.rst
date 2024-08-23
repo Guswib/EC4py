@@ -1,6 +1,11 @@
 ec4py package
 =============
 
+.. automodule:: ec4py
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -18,11 +23,3 @@ Submodules
    ec4py.step_datas
    ec4py.util
    ec4py.util_graph
-
-Module contents
----------------
-
-.. automodule:: ec4py
-   :members:
-   :undoc-members:
-   :show-inheritance:
