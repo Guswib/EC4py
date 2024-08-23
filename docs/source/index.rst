@@ -17,7 +17,7 @@ documentation for details.
 
    intro
    install
-   modules
+   package/modules
    examples/ec_class
 
 Indices and tables
