@@ -6,5 +6,5 @@ ec4py.cv\_data module
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: cv_data
+.. autoclass:: CV_Data
    :members:
