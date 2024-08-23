@@ -15,9 +15,10 @@ documentation for details.
    :maxdepth: 2
    :caption: Contents:
 
+   intro
    install
    modules
-   /class/ec_class
+   examples/ec_class
 
 Indices and tables
 ==================
