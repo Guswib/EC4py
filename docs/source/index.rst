@@ -16,6 +16,7 @@ documentation for details.
    :caption: Contents:
 
    install
+   modules
    /class/ec_class
 
 Indices and tables
