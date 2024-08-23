@@ -15,5 +15,12 @@ documentation for details.
    :maxdepth: 2
    :caption: Contents:
 
+   install
    /class/ec_class
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
