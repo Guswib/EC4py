@@ -14,7 +14,7 @@ from .ec_setup import EC_Setup
 
 from pathlib import Path
 import copy
-from .util import Quantity_Value_Unit as Q_V
+from .util import Quantity_Value_Unit as QV
 from .util_graph import plot_options,quantity_plot_fix, make_plot_2x,make_plot_1x
 
 
@@ -25,7 +25,6 @@ class Step_Datas:
     """# Class to analyze CV datas. 
     Class Functions:
     - .plot() - plot data    
-    - .bg_corr() to back ground correct.
     
     ### Analysis:
     - .Levich() - plot data    
@@ -120,6 +119,11 @@ class Step_Datas:
     
     #################################################################################################    
    
+    def integrate(self,t_start,t_end):
+        charge = [QV()] * len(self.datas)
+        for i in range(len(self.datas)):
+            charge[i].append(self.datas[i].integrate(t_start))
+        return charge
     
     ##################################################################################################################
     def Tafel(self, lims=[-1,1], *args, **kwargs):

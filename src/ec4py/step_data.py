@@ -105,7 +105,7 @@ class Step_Data(EC_Setup):
             #self.step_Type = self.setup_data._setup["Step.Type"].split(";",-1)
             self.step_Time = List_Str2float(self.setup["Step.Time"])
             self.step_E =List_Str2float(self.setup["Step.E"])
-            self.step_Type = self.setup["Step.Type"].split(";",-1)
+            self.step_Type = List_Str2Str(self.setup["Step.Type"])
         except ValueError:
             print("no_data")
         #self.setup = data.setup
@@ -241,6 +241,19 @@ def List_Str2float(list_str:str):
     length = len(LIST)
     for i in range(length):
         LIST[i] = float(LIST[i])
+    return LIST
+
+def List_Str2Str(list_str:str):
+    LIST = list_str.split(";",-1)
+    length = len(LIST)
+    for i in range(length):
+        idx = length-i-1
+        s=LIST[idx].strip()
+        if(len(s)==0):
+            LIST.pop(idx)
+    length = len(LIST)
+    for i in range(length):
+        LIST[i] = str(LIST[i]).strip()
     return LIST
  
  
