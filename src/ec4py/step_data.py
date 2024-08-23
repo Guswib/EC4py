@@ -55,7 +55,25 @@ class Step_Data(EC_Setup):
             return [self.get_step(i) for i in range(start,stop,step)]
         else:
             return self.get_step(item_index)
-    ###########################################       
+    ###########################################
+    @property 
+    def repetitions(self):
+        """setup meta data
+
+        Returns:
+            dict[]: list of key words
+        """
+        return self.setup_data._setup["Repetitions"]
+    
+    @property 
+    def nr_of_steps(self):
+        """setup meta data
+
+        Returns:
+            dict[]: list of key words
+        """
+        return int(self.setup_data._setup["Repetitions"])*len(self.step_Time)
+    ##########################       
     def conv(self, ec_data: EC_Data, *args, ** kwargs):
         """Converts EC_Data to a CV
 
@@ -82,11 +100,12 @@ class Step_Data(EC_Setup):
             self.i =ec_data.i
             self.E = ec_data.E
             
-            self.step_Time = self.setup_data._setup["Step.Time"].split(";",-1)
-            self.step_E = self.setup_data._setup["Step.E"].split(";",-1)
-            self.step_Type = self.setup_data._setup["Step.Type"].split(";",-1)
-
-           
+            #self.step_Time = self.setup["Step.Time"].split(";",-1)
+            #self.step_E = self.setup["Step.E"].split(";",-1)
+            #self.step_Type = self.setup_data._setup["Step.Type"].split(";",-1)
+            self.step_Time = List_Str2float(self.setup["Step.Time"])
+            self.step_E =List_Str2float(self.setup["Step.E"])
+            self.step_Type = self.setup["Step.Type"].split(";",-1)
         except ValueError:
             print("no_data")
         #self.setup = data.setup
@@ -149,14 +168,15 @@ class Step_Data(EC_Setup):
  
     def get_step(self,step_index:int):
         singleStep = Step_Data()
-        singleStep.setup_data = self.setup_data
-        print(self.step_Time)
-        total_nr_steps = len(self.step_Time)-1
+        singleStep.setup_data = copy.deepcopy(self.setup_data)
+        singleStep.setup_data.name =str(self.setup_data.name)  + '#' + str(step_index)
+        #print(self.step_Time)
+        total_nr_steps = len(self.step_Time)
         s=[0.0]
         for i in range(0, total_nr_steps):
             num =float(self.step_Time[i])
             s.append(s[i]+num)
-        print(s)
+        #print(s)
         idx = step_index % total_nr_steps
        # print("total", total_nr_steps)
        # print("idx", idx)
@@ -181,7 +201,7 @@ class Step_Data(EC_Setup):
         np.copyto(singleStep.E, self.E[start_index:end_index+1])
         np.copyto(singleStep.i, self.i[start_index:end_index+1])
         np.copyto(singleStep.Time, self.Time[start_index:end_index+1]-self.Time[start_index])
-        
+        #print(idx)
         singleStep.step_Time =[singleStep.Time.max()]
         singleStep.step_E =[self.step_E[idx]]
         singleStep.step_Type =[self.step_Type[idx]]
@@ -210,3 +230,17 @@ class Step_Data(EC_Setup):
         return
         
         
+def List_Str2float(list_str:str):
+    LIST = list_str.split(";",-1)
+    length = len(LIST)
+    for i in range(length):
+        idx = length-i-1
+        s=LIST[idx].strip()
+        if(len(s)==0):
+            LIST.pop(idx)
+    length = len(LIST)
+    for i in range(length):
+        LIST[i] = float(LIST[i])
+    return LIST
+ 
+ 

@@ -16,7 +16,8 @@ from .ec_setup import EC_Setup
 from .util import extract_value_unit     
 from .util import Quantity_Value_Unit as Q_V
 from .util_graph import plot_options,quantity_plot_fix, make_plot_2x,make_plot_1x
-from .analysis_tafel import Tafel,diffusion_limit_corr
+from .analysis_tafel import Tafel
+from .analysis_levich import diffusion_limit_corr
 
 STYLE_POS_DL = "bo"
 STYLE_NEG_DL = "ro"
@@ -188,7 +189,7 @@ class CV_Data(EC_Setup):
         
         try:
             #print("CONVERTING_AAA",len(ec_data.Time), len(ec_data.E), len(ec_data.i))
-            self.setup_data = ec_data.setup_data
+            self.setup_data = copy.deepcopy(ec_data.setup_data)
             self.convert(ec_data.Time,ec_data.E,ec_data.i,**kwargs)
            
         except ValueError:

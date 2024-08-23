@@ -1,5 +1,5 @@
 from .util import extract_value_unit
-from .util import Quantity_Value_Unit as Q_V
+from .util import Quantity_Value_Unit as QV
 
 
 class ec_setup_data:
@@ -62,7 +62,7 @@ class EC_Setup:
         Returns:
             area value and unit.
         """
-        return Q_V(self.setup_data._area,self.setup_data._area_unit,"A")
+        return QV(self.setup_data._area,self.setup_data._area_unit,"A")
         
     @area.setter
     def area(self, value:float):
@@ -80,7 +80,7 @@ class EC_Setup:
 ## ROTATION
     @property
     def rotation(self):
-        return Q_V(self.setup_data._rotation,self.setup_data._rotation_unit,"\u03C9") #using GREEK SMALL LETTER OMEGA
+        return QV(self.setup_data._rotation,self.setup_data._rotation_unit,"\u03C9") #using GREEK SMALL LETTER OMEGA
 
     @rotation.setter
     def rotation(self, value:float):
@@ -113,7 +113,7 @@ class EC_Setup:
             float: sweep rate in V/s
         """
         v,u = extract_value_unit(self.setup_data._setup['Rate'])
-        return Q_V(v,u,"v")
+        return QV(v,u,"v")
     ###########################################################
     
     @property
@@ -124,7 +124,7 @@ class EC_Setup:
             float: weight in g
         """
         v,u = extract_value_unit(self.setup_data._setup['Electrode.Cat.Weight'])
-        return Q_V(v,u,"m")
+        return QV(v,u,"m")
     
     @property
     def loading(self):
@@ -134,7 +134,7 @@ class EC_Setup:
             float: loading in g m^-2
         """
         v,u = extract_value_unit(self.setup_data._setup['Electrode.Cat.Loading'])
-        return Q_V(v,u,"m /A")
+        return QV(v,u,"m /A")
     
     @property
     def temp0(self):
@@ -144,13 +144,13 @@ class EC_Setup:
             float: loading in g m^-2
         """
         v,u = extract_value_unit(self.setup_data._setup['Temp_0'])
-        return Q_V(v,u,"T")
+        return QV(v,u,"T")
     
     @property
     def pressure(self):
         """returns the pressure."""
         v,u = extract_value_unit(self.setup_data._setup['Pressure'])
-        return Q_V(v,u,"p")
+        return QV(v,u,"p")
     
     @property
     def name(self):
@@ -202,7 +202,7 @@ class EC_Setup:
         return "_"
         
     def get_norm_factor(self, norm_to:str):
-        norm_factor = Q_V(1)
+        norm_factor = QV(1)
          
         if norm_to == "area" :
            
@@ -211,7 +211,7 @@ class EC_Setup:
         elif norm_to == "area_cm":
             norm_factor = self.area
             if norm_factor.unit == "m^2":
-                norm_factor = norm_factor*Q_V(1e4,"cm^2 m^-2")
+                norm_factor = norm_factor*QV(1e4,"cm^2 m^-2")
 
         elif norm_to == "rate" :
            norm_factor = self.rate
