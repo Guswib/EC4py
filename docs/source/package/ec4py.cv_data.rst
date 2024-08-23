@@ -7,3 +7,4 @@ ec4py.cv\_data module
    :show-inheritance:
 
 .. autoclass:: cv_data
+   :members:
