@@ -1,7 +1,7 @@
 
 
 
-Example class EC_data
+Example class cv_datas
 ================================================
 
 

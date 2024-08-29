@@ -1,11 +1,11 @@
 """
-Module for reading binary TDMS files produced by EC4 View\n
+Module for reading binary TDMS files produced by EC4 DAQ\n
 
 ec_data is used to load in the raw files. 
 
 """
 
-from .ec_data import EC_Data 
+#from .ec_data import EC_Data 
 from .ec_datas import EC_Datas 
 from .cv_data import CV_Data
 from .cv_datas import CV_Datas 
