@@ -42,8 +42,10 @@ class CV_Datas:
     """
     def __init__(self, paths:list[Path] | Path, **kwargs):
         
-        if isinstance(paths,Path ):
+        if not isinstance(paths,list ):
             path_list = [paths]
+        #if isinstance(paths,Path ):
+        #    path_list = [paths]
         else:
             path_list = paths
         self.datas = [CV_Data() for i in range(len(path_list))]

@@ -7,7 +7,7 @@ Examples
    :caption: Contents:
 
    
-   ec_data
-   ec_datas
-   cv_data
-   cv_datas
+   ex_ec_data
+   ex_ec_datas
+   cv_data_ex1
+   cv_datas_ex1
