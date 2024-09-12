@@ -30,4 +30,4 @@ Issues = "https://github.com/Guswib/EC4py"
 Changelog = "https://github.com/Guswib/EC4py"
 
 [tool.setuptools.packages.find]
-where = [ "src",]
+where = [ "src" ,]
